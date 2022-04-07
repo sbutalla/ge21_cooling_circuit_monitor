@@ -10,7 +10,7 @@ The script is executed from the command line:
 
 Available options are:
 
-`-p`, `--printData` Prints data to standard output
+`-p`, `--printData`, Prints data to standard output
 
 `-w`, `--write`, Writes data to a text file
 
