@@ -9,6 +9,8 @@ The script is executed from the command line:
 
 Available options are:
 `-p`, `--printData", Prints data to standard output
+
 `-w`, `--write`, Writes data to a text file
+
 `-g`, `--googleSheet`, Sends data to a Google Sheet (not yet implemented)
     
