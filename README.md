@@ -1,6 +1,6 @@
 # GE2/1 Cooling Circuit Monitor
 ## Erick Yanes, Bandar Alsufyani, Stephen D. Butalla
-### 2022/04/07
+### 2022/04/10
 
 Software used to retrieve data from temperature and humidity sensors on the GE2/1 cooling circuit.
 
@@ -14,5 +14,5 @@ Available options are:
 
 `-w`, `--write`, Writes data to a text file
 
-`-g`, `--googleSheet`, Sends data to a Google Sheet (not yet implemented)
+`-g`, `--googleSheet`, Sends data to a Google Sheet
     
