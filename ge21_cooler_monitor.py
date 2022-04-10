@@ -9,7 +9,7 @@ import argparse
 import os
 import gspread
 import numpy as np
-
+from utilities.colors import *
 
 # Constants
 dataDir = "myDir"
