@@ -10,9 +10,21 @@ import os
 import gspread
 import numpy as np
 from utilities.colors import *
+import smtplib
 
 # Constants
 dataDir = "myDir"
+
+#Set up email and local host to be ready to send alert
+#NOTE - Email most likely will go to spam, make sure everyone marks it as not spam
+sender = 'from@fromdomain.com'
+receivers = ['eyanes2021@my.fit.edu','balsufyani2017@my.fit.edu','sbutalla2012@my.fit.edu']
+message = """From: From GE 2/1 <from@fromdomain.com>
+To: To Person <eyanes2021@my.fit.edu,balsufyani2017@my.fit.edu,sbutalla2012@my.fit.edu>
+Subject: Alert From GE 2/1 Arduino
+There is an alert from the GE 2/1 arduino, you may want to go check it.
+"""
+smtpObj = smtplib.SMTP('localhost')
 
 def format():
 
@@ -43,12 +55,23 @@ def DewPoint(T,RH):
 	
 	return dewpnt
 
+def EmailAlert():
+	
+	#Sends out email alert to users
+	try:
+   		smtpObj.sendmail(sender, receivers, message)
+   		print("Successfully sent email")
+	except:
+   		print("Error: unable to send email")
+
+
+
 def getData(printData, writeData, googleSheet):
 
 	fullPath = format()
 	# Connect to serial (output) of ardruino
 	# NOTE - COM will change based on usb connection
-	ser = serial.Serial('COM3' ,  9800, timeout = 2.1)
+	ser = serial.Serial('/dev/ttyUSB0' ,  9800, timeout = 2.1)
 	
 	if googleSheet == True:		
 		
@@ -87,8 +110,9 @@ def getData(printData, writeData, googleSheet):
 			dewpnt = DewPoint(amb_temp, hum)
 			
 			if (dewpnt > M8_temp or dewpnt > M5_temp) and counter == 0:
-				# send email
-				print(dewpnt)
+				EmailAlert()
+				print("\nDew Point has been reached!")
+				counter = 1
 			else:
 				pass
 			
@@ -120,7 +144,8 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--printData", action="store_true", dest="printData", default=False, help="Print data to standard out")
     parser.add_argument("-w", "--write", action="store_true", dest="writeData", default=False, help="Write data to a file")
     parser.add_argument("-g", "--googleSheet", action="store_true", dest="googleSheet", default=False, help="Send data to Google Sheet")
-    
+    parser.add_argument("-t", "--testEmail", action="store_true", dest="testEmail", default=False, help="Send an email alert to all users")    
+
     args = parser.parse_args()    
     
     # Check arguments
@@ -128,7 +153,11 @@ if __name__ == "__main__":
         print(colors.YELLOW + "Must write data to a file to send it to a Google Sheet" + colors.ENDC)
         sys.exit()
 
-    try:
-        getData(args.printData, args.writeData, args.googleSheet)
-    except KeyboardInterrupt:
-        print(colors.RED + "\nKeyboard Interrupt encountered" + colors.ENDC)
+    if args.testEmail is False:
+        try:
+            getData(args.printData, args.writeData, args.googleSheet)
+        except KeyboardInterrupt:
+            print(colors.RED + "\nKeyboard Interrupt encountered" + colors.ENDC)
+
+    if args.testEmail is True:
+        EmailAlert()
