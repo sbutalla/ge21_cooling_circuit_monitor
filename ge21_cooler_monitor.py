@@ -70,7 +70,7 @@ def getData(printData, writeData, googleSheet):
 
 	fullPath = format()
 	# Connect to serial (output) of ardruino
-	# NOTE - COM will change based on usb connection
+	# NOTE - String will change based on usb connection
 	ser = serial.Serial('/dev/ttyUSB0' ,  9800, timeout = 2.1)
 	
 	if googleSheet == True:		
