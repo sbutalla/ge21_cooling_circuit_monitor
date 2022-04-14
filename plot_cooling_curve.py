@@ -9,13 +9,15 @@ from utilities.colors import *
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from datetime import datetime
 
-
-
+		
+	
 
 def plot(file):
 	reader = csv.reader(file)
 	
+	#Defile path to directory to save plots
 	path = file.name.replace(".txt", "/")
 	os.mkdir(path)
 
@@ -37,7 +39,9 @@ def plot(file):
 	m5_temp = Data[0:, 4]
 	
 	#Convert timestamp into time elasped
-	time_elapsed = np.linspace(0, timestamp.shape[0] * 2.1 / (60*60), timestamp.shape[0])
+	timestamp = [datetime.strptime(stamp, "%Y-%m-%d_%H-%M-%S") for stamp in timestamp]
+	time_elapsed = [(tdt.hour - timestamp[0].hour) + (tdt.minute - timestamp[0].minute)/60 + (tdt.second - timestamp[0].second)/3600 for tdt in timestamp]
+	
 	
 	#Start plotting
 	fig = plt.figure()
@@ -86,12 +90,10 @@ if __name__ == "__main__":
 	if args.filename == "":
 		print(colors.YELLOW + "Must include File Name" + colors.ENDC)
 		sys.exit()
-	with open(args.filename, "r") as file:
-		plot(file)
-	"""
+
 	try:
 		with open(args.filename, "r") as file:
 			plot(file)
 	except:
 		print(colors.RED + "File not found" + colors.ENDC)
-	"""	
+	
