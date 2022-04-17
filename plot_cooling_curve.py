@@ -33,14 +33,15 @@ def plot(file):
 	#Data comes in as:
 	#Timestamp, Humidity, Ambient Temperature, M8 Temperature, M5 Temperature
 	timestamp = Data[0:, 0]
-	hum = Data[0:, 1]
-	amb_temp = Data[0:, 2]
-	m8_temp = Data[0:, 3]
-	m5_temp = Data[0:, 4]
+	hum = Data[0:, 1].astype('float64')
+	amb_temp = Data[0:, 2].astype('float64')
+	m8_temp = Data[0:, 3].astype('float64')
+	m5_temp = Data[0:, 4].astype('float64')
+	
 	
 	#Convert timestamp into time elasped
 	timestamp = [datetime.strptime(stamp, "%Y-%m-%d_%H-%M-%S") for stamp in timestamp]
-	time_elapsed = [(tdt.hour - timestamp[0].hour) + (tdt.minute - timestamp[0].minute)/60 + (tdt.second - timestamp[0].second)/3600 for tdt in timestamp]
+	time_elapsed = [(tdt.day - timestamp[0].day)*24 + (tdt.hour - timestamp[0].hour) + (tdt.minute - timestamp[0].minute)/60 + (tdt.second - timestamp[0].second)/3600 for tdt in timestamp]
 	
 	
 	#Start plotting
@@ -49,27 +50,32 @@ def plot(file):
 	fig.set_size_inches(14,6)
 	
 	
+	
 	plt.plot(time_elapsed, hum)
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Reletive Humidity (%)")
+	plt.grid()
 	plt.savefig(path + "Humidity.pdf")
 	plt.cla()
 	
 	plt.plot(time_elapsed, amb_temp)
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Temperature (" + u'\N{DEGREE SIGN}' + 'C)')
+	plt.grid()
 	plt.savefig(path + "Ambient_Temperature.pdf")
 	plt.cla()
 	
 	plt.plot(time_elapsed, m8_temp)
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Temperature (" + u'\N{DEGREE SIGN}' + 'C)')
+	plt.grid()
 	plt.savefig(path + "M8_Temperature.pdf")
 	plt.cla()
 	
 	plt.plot(time_elapsed, m5_temp)
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Temperature (" + u'\N{DEGREE SIGN}' + 'C)')
+	plt.grid()
 	plt.savefig(path + "M5_Temperature.pdf")
 	
 	
