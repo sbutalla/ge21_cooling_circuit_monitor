@@ -52,6 +52,7 @@ def plot(file):
 	
 	
 	plt.plot(time_elapsed, hum)
+	plt.title("Relative Humidity")
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Reletive Humidity (%)")
 	plt.grid()
@@ -59,6 +60,7 @@ def plot(file):
 	plt.cla()
 	
 	plt.plot(time_elapsed, amb_temp)
+	plt.title("Ambient Temperature")
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Temperature (" + u'\N{DEGREE SIGN}' + 'C)')
 	plt.grid()
@@ -66,6 +68,7 @@ def plot(file):
 	plt.cla()
 	
 	plt.plot(time_elapsed, m8_temp)
+	plt.title("M8 Temperature")
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Temperature (" + u'\N{DEGREE SIGN}' + 'C)')
 	plt.grid()
@@ -73,6 +76,7 @@ def plot(file):
 	plt.cla()
 	
 	plt.plot(time_elapsed, m5_temp)
+	plt.title("M5 Temperature")
 	ax.set_xlabel("Elapsed Time (hrs)")
 	ax.set_ylabel("Temperature (" + u'\N{DEGREE SIGN}' + 'C)')
 	plt.grid()
