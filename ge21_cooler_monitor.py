@@ -41,7 +41,7 @@ def format():
 	fullPath = dataDir + "/" + "Chiller_Data_" + str_date + ".txt"
 
 	file = open(fullPath, "a")
-	file.write("time, humidity, ambient_temp, m8_temp, m5_temp\n") # File header
+	file.write("time, humidity, ambient_temp, m8_temp, m5_temp, dew point\n") # File header
 
 	return fullPath
 	
@@ -121,17 +121,17 @@ def getData(printData, writeData, googleSheet):
 			if printData == True:
 				# Data is a comma separated list in this order:
 				# Humidity, Ambient Temperature, M8 Temperature, M5 Temperature
-				print(("%s, %f, %f, %f, %f\n" % (str_date, hum, amb_temp, M8_temp, M5_temp)))
+				print(("%s, %f, %f, %f, %f, %f\n" % (str_date, hum, amb_temp, M8_temp, M5_temp, dewpnt)))
 			else:
 				pass
 
 			if writeData == True:
 				with open(fullPath, 'a') as file: # write data and close file to save
-					file.write("%s, %f, %f, %f, %f\n" % (str_date, hum, amb_temp, M8_temp, M5_temp))
+					file.write("%s, %f, %f, %f, %f, %f\n" % (str_date, hum, amb_temp, M8_temp, M5_temp, dewpnt))
 			else:
 				pass
 			if googleSheet == True: # Write data to google sheets, sent as a list
-				wks.append_row([str_date, amb_temp, hum, M5_temp, M8_temp])
+				wks.append_row([str_date, amb_temp, hum, M5_temp, M8_temp, dewpnt])
 			else:
 				pass
 

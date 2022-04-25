@@ -1,1 +1,0 @@
-time, humidity, ambient_temp, m8_temp, m5_temp

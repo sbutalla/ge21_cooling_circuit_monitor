@@ -15,7 +15,8 @@ plt.rcParams.update({"font.size": 24}) # Increase font size
 
 dh22_temp_err = 0.5 # deg. C
 dh22_hum_err  = 0.02 # 2% accuracy
-ds18b20_err   = 0.5 # deg. C     
+ds18b20_err   = 0.5 # deg. C
+dew_err       = 0.5 #deg. C     
         
 def plot(filename, all_data, all_temp):
 
@@ -41,12 +42,13 @@ def plot(filename, all_data, all_temp):
         Data = np.array(rows)
 
     #Data comes in as:
-    #Timestamp, Humidity, Ambient Temperature, M8 Temperature, M5 Temperature
+    #Timestamp, Humidity, Ambient Temperature, M8 Temperature, M5 Temperature, Dew Point
     timestamp = Data[0:, 0]
     hum       = Data[0:, 1].astype('float64')
     amb_temp  = Data[0:, 2].astype('float64')
     m8_temp   = Data[0:, 3].astype('float64')
     m5_temp   = Data[0:, 4].astype('float64')
+    dewpnt    = Data[0:, 5].astype('float64')
 
     hum_s = np.reshape(hum, (len(hum,)))
     print(type(hum))
@@ -54,23 +56,23 @@ def plot(filename, all_data, all_temp):
     amb_temp_err = np.full((len(amb_temp),), dh22_temp_err, dtype = float)
     m8_temp_err  = np.full((len(m8_temp),), ds18b20_err, dtype = float)
     m5_temp_err  = np.full((len(m5_temp),), ds18b20_err, dtype = float)
-    
+    dewpnt_err   = np.full((len(dewpnt),), dew_err, dtype = float)
     
     
     #Convert timestamp into time elasped
     timestamp = [datetime.strptime(stamp, "%Y-%m-%d_%H-%M-%S") for stamp in timestamp]
     time_elapsed = [(tdt.day - timestamp[0].day)*24 + (tdt.hour - timestamp[0].hour) + (tdt.minute - timestamp[0].minute)/60 + (tdt.second - timestamp[0].second)/3600 for tdt in timestamp]
     
-    dataset        = [hum, amb_temp, m8_temp, m5_temp] 
-    errors         = [hum_err, amb_temp_err, m8_temp_err, m5_temp_err]
+    dataset        = [hum, amb_temp, m8_temp, m5_temp, dewpnt] 
+    errors         = [hum_err, amb_temp_err, m8_temp_err, m5_temp_err, dew_err]
     x_label        = "Elapsed Time (hrs)"
     y_labels       = ["Relative humidity (%)", r'Temperature ($^{\circ}$C)']
-    leg_labels     = ["Ambient relative humidity", r'Ambient temperature', r'M8 ambient temperature', r'M5 ambient temperature']
-    leg_labels_err = ["Ambient relative humidity error", r'Ambient temperature error', r'M8 ambient temperature error', r'M5 ambient temperature error']
-    color          = ["tab:blue", "tab:red", "tab:green", "tab:orange"]
+    leg_labels     = ["Ambient relative humidity", r'Ambient temperature', r'M8 ambient temperature', r'M5 ambient temperature', r'Dew point']
+    leg_labels_err = ["Ambient relative humidity error", r'Ambient temperature error', r'M8 ambient temperature error', r'M5 ambient temperature error', 'Dew point error']
+    color          = ["tab:blue", "tab:red", "tab:green", "tab:orange", "tab:purple"]
 
 
-
+    fig, ax = plt.subplots()
         
     # plot humidity
     plt.plot(time_elapsed, hum, color = color[0], label = leg_labels[0])
@@ -91,7 +93,7 @@ def plot(filename, all_data, all_temp):
     plt.grid()
     plt.title("Ambient Temperature")
     ax.set_xlabel(x_label, loc = "right")
-    ax.set_ylabel(y_labels[0], loc = "top")
+    ax.set_ylabel(y_labels[1], loc = "top")
     ax.legend(loc = 1)
 
     ax.text(-0.09, 1.01, 'CMS', fontweight='bold', fontsize=38, transform=ax.transAxes)
@@ -105,7 +107,7 @@ def plot(filename, all_data, all_temp):
     plt.grid()
     plt.title("M8 Temperature")
     ax.set_xlabel(x_label, loc = "right")
-    ax.set_ylabel(y_labels[0], loc = "top")
+    ax.set_ylabel(y_labels[1], loc = "top")
     ax.legend(loc = 1)
 
     ax.text(-0.09, 1.01, 'CMS', fontweight='bold', fontsize=38, transform=ax.transAxes)
@@ -119,7 +121,7 @@ def plot(filename, all_data, all_temp):
     plt.grid()
     plt.title("M5 Temperature")
     ax.set_xlabel(x_label, loc = "right")
-    ax.set_ylabel(y_labels[0], loc = "top")
+    ax.set_ylabel(y_labels[1], loc = "top")
     ax.legend(loc = 1)
 
     ax.text(-0.09, 1.01, 'CMS', fontweight='bold', fontsize=38, transform=ax.transAxes)
@@ -127,6 +129,20 @@ def plot(filename, all_data, all_temp):
 
     plt.tight_layout()
     plt.savefig(path + "M5_Temperature.pdf")
+    
+    # plot dew point
+    plt.plot(time_elapsed, dewpnt,  color = color[4], label = leg_labels[4])
+    plt.grid()
+    plt.title("Dew Point")
+    ax.set_xlabel(x_label, loc = "right")
+    ax.set_ylabel(y_labels[1], loc = "top")
+    ax.legend(loc = 1)
+
+    ax.text(-0.09, 1.01, 'CMS', fontweight='bold', fontsize=38, transform=ax.transAxes)
+    ax.text(-0.01, 1.01, 'Muon R&D',fontstyle='italic', fontsize=34, transform=ax.transAxes)
+
+    plt.tight_layout()
+    plt.savefig(path + "Dew_Point")
 
     
     if all_temp == True:
