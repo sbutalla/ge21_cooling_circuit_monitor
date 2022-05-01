@@ -14,9 +14,21 @@ from datetime import datetime
 plt.rcParams.update({"font.size": 24}) # Increase font size
 
 dh22_temp_err = 0.5 # deg. C
-dh22_hum_err  = 0.02 # 2% accuracy
+dh22_hum_err  = 2.0 # 2% accuracy
 ds18b20_err   = 0.5 # deg. C
-dew_err       = 0.5 #deg. C     
+
+
+def DewErr (dewpnt, temp, hum): # Give array of Dew Point error through propagation
+    error = []
+    a = 17.625
+    b = 243.04
+    for i in range(len(dewpnt)):     
+        alpha = np.log(hum[i] / 100) + (a*temp[i]/(b+temp[i]))
+        sigalpha = (((dh22_hum_err/hum[i])**2) + ((b+temp[i]-a*temp[i]-1)/(b+temp[i])**2)**2 * dh22_temp_err**2)**0.5
+        err = dewpnt[i] * np.sqrt(2) * sigalpha/alpha
+        error.append(err)
+    
+    return np.array(error) 
         
 def plot(filename, all_data, all_temp):
 
@@ -50,13 +62,11 @@ def plot(filename, all_data, all_temp):
     m5_temp   = Data[0:, 4].astype('float64')
     dewpnt    = Data[0:, 5].astype('float64')
 
-    hum_s = np.reshape(hum, (len(hum,)))
-    print(type(hum))
-    hum_err      = np.multiply(dh22_hum_err,hum_s)
+    hum_err      = np.full((len(hum),),dh22_hum_err, dtype = float)
     amb_temp_err = np.full((len(amb_temp),), dh22_temp_err, dtype = float)
     m8_temp_err  = np.full((len(m8_temp),), ds18b20_err, dtype = float)
     m5_temp_err  = np.full((len(m5_temp),), ds18b20_err, dtype = float)
-    dewpnt_err   = np.full((len(dewpnt),), dew_err, dtype = float)
+    dewpnt_err   = DewErr(dewpnt, amb_temp, hum)
     
     
     #Convert timestamp into time elasped
@@ -64,7 +74,8 @@ def plot(filename, all_data, all_temp):
     time_elapsed = [(tdt.day - timestamp[0].day)*24 + (tdt.hour - timestamp[0].hour) + (tdt.minute - timestamp[0].minute)/60 + (tdt.second - timestamp[0].second)/3600 for tdt in timestamp]
     
     dataset        = [hum, amb_temp, m8_temp, m5_temp, dewpnt] 
-    errors         = [hum_err, amb_temp_err, m8_temp_err, m5_temp_err, dew_err]
+    errors         = [hum_err, amb_temp_err, m8_temp_err, m5_temp_err, dewpnt_err]
+#LD_LIBRARY_PATH=/opt/wiscrpcsvc/lib:$LD_LIBRARY_PATH
     x_label        = "Elapsed Time (hrs)"
     y_labels       = ["Relative humidity (%)", r'Temperature ($^{\circ}$C)']
     leg_labels     = ["Ambient relative humidity", r'Ambient temperature', r'M8 ambient temperature', r'M5 ambient temperature', r'Dew point']
@@ -174,9 +185,10 @@ def plot(filename, all_data, all_temp):
         for temp in range(1, len(dataset)):
             ax0.errorbar(time_elapsed,  dataset[temp], errors[temp], marker='o', markersize=4, label = leg_labels[temp])
 
+
         ax1 = ax0.twinx() 
         ax1.set_ylabel(y_labels[0], loc = "top")  # we already handled the x-label with ax1
-        ax1.errorbar(time_elapsed,  dataset[0], errors[0], color[0], marker='o', markersize=4, label = leg_labels[0])
+        ax1.errorbar(time_elapsed,  dataset[0], marker='o', markersize=4, label = leg_labels[0])
 
         ax0.text(-0.09, 1.01, 'CMS', fontweight='bold', fontsize=30, transform=ax0.transAxes)
         ax0.text(-0.01, 1.01, 'Muon R&D',fontstyle='italic', fontsize=26, transform=ax0.transAxes)
